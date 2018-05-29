@@ -2,7 +2,7 @@
 contributions.py
 Scrapes and returns GitHub Contribution data in Python dict() format.
 """
-
+import collections
 import datetime
 from urllib.request import urlopen
 
@@ -22,6 +22,7 @@ def get_contributions_daily(uname, today_only=False):
     "last_updated": "2018-05-29 16:23:33",
     "username": "droxey"}
     """
+    contribs = {}
     rects = _get_contributions_element(uname)
     json = {
         'contributions': {},
@@ -30,17 +31,21 @@ def get_contributions_daily(uname, today_only=False):
     }
     for rect in rects:
         data_date = rect.get('data-date')
-        json['contributions'][data_date] = int(rect.get('data-count', 0))
+        count = int(rect.get('data-count', 0))
+        if count > 0:
+            contribs[data_date] = count
     if today_only:
         today = datetime.date.today().strftime("%Y-%m-%d")
-        json['contributions'] = {today: json['contributions'].get(today, 0)}
+        contribs = {today: contribs.get(today, 0)}
+    json['contributions'] = collections.OrderedDict(sorted(contribs.items()))
     return json
 
 
 def get_contributions_today(uname):
     """
     Output:
-    {"contributions": {"2018-05-29": 0}, "last_updated": "2018-05-29 16:23:33", "username": "droxey"}
+    {"contributions": {"2018-05-29": 0},
+        "last_updated": "2018-05-29 16:23:33", "username": "droxey"}
     """
     return get_contributions_daily(uname, today_only=True)
 
