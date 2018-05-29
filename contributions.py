@@ -37,7 +37,8 @@ def get_contributions_daily(uname, today_only=False):
     if today_only:
         today = datetime.date.today().strftime("%Y-%m-%d")
         contribs = {today: contribs.get(today, 0)}
-    json['contributions'] = collections.OrderedDict(sorted(contribs.items()))
+    json['contributions'] = collections.OrderedDict(
+        sorted(contribs.items(), reverse=True))
     return json
 
 
