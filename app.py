@@ -10,10 +10,12 @@ import tornado.autoreload
 import tornado.wsgi
 
 from contributions import get_contributions_daily, \
-    get_contributions_weekly, get_contributions_monthly
+    get_contributions_weekly, get_contributions_monthly, \
+    get_contributions_today
 
 
 INTERVALS = (
+    ('today', get_contributions_today),
     ('daily', get_contributions_daily),
     ('weekly', get_contributions_weekly),
     ('monthly', get_contributions_monthly)
@@ -47,11 +49,6 @@ def run_server():
         tornado.wsgi.WSGIContainer(app)
     )
     http_server.listen(8888)
-
-    # Reads args given at command line (this also enables logging to stderr)
-    # tornado.options.parse_command_line()
-
-    # Start the I/O loop with autoreload
     io_loop = tornado.ioloop.IOLoop.instance()
     tornado.autoreload.start(io_loop)
     try:

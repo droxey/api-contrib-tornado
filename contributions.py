@@ -9,16 +9,24 @@ def get_contributions_daily(uname, today_only=False):
     Output:
     [{"date" : "2017-02-27",  "count" : "2"}, {"date" : "2017-02-28", "count" : "10"}]
     """
-    today = datetime.date.today().strftime("%Y-%m-%d")
     rects = get_contributions_element(uname)
     json = {'contributions': []}
     for rect in rects:
         data_date = rect.get('data-date')
         data_count = int(rect.get('data-count', 0))
-        year, month, day = (int(x) for x in data_date.split('-'))
-        the_day = datetime.date(year, month, day)
         json['contributions'].append({'date': data_date, 'count': data_count})
+    if today_only:
+        today_contribs = {'contributions': []}
+        today_contribs['contributions'].append(json['contributions'][-1])
+        json = today_contribs
     return json
+
+
+def get_contributions_today(uname):
+    """
+    Output: {"contributions": [{"date": "2018-05-29", "count": 5}]}
+    """
+    return get_contributions_daily(uname, today_only=True)
 
 
 def get_contributions_weekly(uname):
