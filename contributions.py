@@ -22,7 +22,7 @@ def get_contributions_daily(uname, today_only=False):
         json['contributions'][data_date] = int(rect.get('data-count', 0))
     if today_only:
         today = datetime.date.today().strftime("%Y-%m-%d")
-        json['contributions'] = {today: json.get(today, 0)}
+        json['contributions'] = {today: json['contributions'].get(today, 0)}
     json['username'] = uname
     return json
 
