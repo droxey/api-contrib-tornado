@@ -1,6 +1,6 @@
 # api-contrib-tornado
 
-Using Tornado + GEvent + BeautifulSoup to asynchronously scrape daily, weekly, and monthly GitHub contribution statistics from a user's GitHub profile page.
+Using Tornado + BeautifulSoup to asynchronously scrape daily, weekly, and monthly GitHub contribution statistics from a user's GitHub profile page.
 
 ## Installation
 

@@ -1,6 +1,6 @@
 """
 server.py
-Simple Tornado + Gevent API for GitHub contributions.
+Simple Tornado API for GitHub contributions.
 """
 import tornado.web
 import tornado.httpserver
@@ -27,21 +27,19 @@ class StatsHandler(tornado.web.RequestHandler):
     URL: /api/stats/<daily|weekly|monthly>/<username>/
     """
 
-    def get(self, *args, **kwargs):
+    def get(self, interval, username):
         try:
-            interval_func = dict(INTERVALS)[args[0]]
-            username = args[1]
-            returned_data = interval_func(username)
-            self.write(returned_data)
+            get_data_function = dict(INTERVALS)[interval]
+            self.write(get_data_function(username))
         except KeyError:
             self.write(
-                f"Could not find feed for interval '{args[0]}'.\
-                Please try 'daily', 'weekly' or 'monthly.'")
+                f"Could not find feed named '{interval}'.\
+                Please try 'today', 'daily', 'weekly', or 'monthly.'")
 
 
 def run_server():
     app = tornado.wsgi.WSGIApplication([
-        (r"/api/stats/(\w+)+/(\w+)+/$", StatsHandler),
+        (r"/api/stats/([daily|weekly|monthly|today]+)/(\w+)+/$", StatsHandler),
     ], **{
         'debug': True,
     })

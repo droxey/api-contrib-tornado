@@ -6,11 +6,11 @@ name = "pypi"
 [packages]
 "bs4" = "*"
 tornado = "*"
-gevent = "*"
-greenlet = "*"
+ipython = "*"
 
 [dev-packages]
 rope = "*"
+ipython = "*"
 
 [requires]
 python_version = "3.6"
