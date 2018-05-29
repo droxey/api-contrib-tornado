@@ -4,7 +4,7 @@ from urllib.request import urlopen
 from bs4 import BeautifulSoup
 
 
-def get_contributions_daily(uname):
+def get_contributions_daily(uname, today_only=False):
     """
     Output:
     [{"date" : "2017-02-27",  "count" : "2"}, {"date" : "2017-02-28", "count" : "10"}]

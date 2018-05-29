@@ -2,9 +2,13 @@
 server.py
 Simple Tornado + Gevent API for GitHub contributions.
 """
-from tornado.web import RequestHandler
-from tornado.wsgi import WSGIApplication
-from gevent.pywsgi import WSGIServer
+import tornado.web
+import tornado.httpserver
+import tornado.ioloop
+import tornado.options
+import tornado.autoreload
+import tornado.wsgi
+
 from contributions import get_contributions_daily, \
     get_contributions_weekly, get_contributions_monthly
 
@@ -16,7 +20,7 @@ INTERVALS = (
 )
 
 
-class StatsHandler(RequestHandler):
+class StatsHandler(tornado.web.RequestHandler):
     """
     URL: /api/stats/<daily|weekly|monthly>/<username>/
     """
@@ -33,13 +37,32 @@ class StatsHandler(RequestHandler):
                 Please try 'daily', 'weekly' or 'monthly.'")
 
 
+def run_server():
+    app = tornado.wsgi.WSGIApplication([
+        (r"/api/stats/(\w+)+/(\w+)+/$", StatsHandler),
+    ], **{
+        'debug': True,
+    })
+    http_server = tornado.httpserver.HTTPServer(
+        tornado.wsgi.WSGIContainer(app)
+    )
+    http_server.listen(8888)
+
+    # Reads args given at command line (this also enables logging to stderr)
+    # tornado.options.parse_command_line()
+
+    # Start the I/O loop with autoreload
+    io_loop = tornado.ioloop.IOLoop.instance()
+    tornado.autoreload.start(io_loop)
+    try:
+        io_loop.start()
+    except KeyboardInterrupt:
+        pass
+
+
 if __name__ == "__main__":
     print("[LISTEN] http://localhost:8888")
     print("---")
     print("[DAILY] http://localhost:8888/api/stats/daily/droxey/")
     print("---")
-    APP = WSGIApplication([
-        (r"/api/stats/(\w+)+/(\w+)+/$", StatsHandler),
-    ], **{})
-    SERVER = WSGIServer(('', 8888), APP)
-    SERVER.serve_forever()
+    run_server()
