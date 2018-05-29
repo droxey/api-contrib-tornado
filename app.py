@@ -2,17 +2,25 @@
 server.py
 Simple Tornado API for GitHub contributions.
 """
-import tornado.web
+import os
+
+import tornado.autoreload
 import tornado.httpserver
 import tornado.ioloop
-import tornado.autoreload
+import tornado.web
 import tornado.wsgi
 from tornado.options import define, options
 
-from contributions import get_contributions_daily, \
-    get_contributions_weekly, get_contributions_monthly, \
-    get_contributions_today
+from contributions import (get_contributions_daily, get_contributions_monthly,
+                           get_contributions_today, get_contributions_weekly)
+from dotenv import load_dotenv
 
+
+define("port", default=8889, help="run on the given port", type=int)
+load_dotenv()
+
+
+MONGODB_URI = os.getenv('MONGODB_URI')
 
 INTERVALS = (
     ('today', get_contributions_today),
@@ -21,11 +29,20 @@ INTERVALS = (
     ('monthly', get_contributions_monthly)
 )
 
-define("port", default=8888, help="run on the given port", type=int)
+
+class IndexHandler(tornado.web.RequestHandler):
+    """
+    Serves the homepage for the project.
+    URL: /
+    """
+
+    def get(self):
+        self.render("index.html", **{})
 
 
 class StatsHandler(tornado.web.RequestHandler):
     """
+    Serves GitHub Contribution data via JSON API.
     URL: /api/stats/<daily|weekly|monthly>/<username>/
     """
 
@@ -40,8 +57,10 @@ class StatsHandler(tornado.web.RequestHandler):
 
 
 def run_server():
+    """ Start Tornado. """
     tornado.options.parse_command_line()
     app = tornado.wsgi.WSGIApplication([
+        (r"/$", IndexHandler),
         (r"/api/stats/([daily|weekly|monthly|today]+)/(\w+)+/$", StatsHandler),
     ], **{
         'debug': True,
@@ -59,8 +78,5 @@ def run_server():
 
 
 if __name__ == "__main__":
-    print("[LISTEN] http://localhost:8888")
-    print("---")
-    print("[DAILY] http://localhost:8888/api/stats/daily/droxey/")
-    print("---")
+    print(f"[LISTENING] http://localhost:{options.port}")
     run_server()
