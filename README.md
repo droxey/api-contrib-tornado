@@ -2,7 +2,7 @@
 
 Using Tornado + BeautifulSoup to asynchronously scrape daily, weekly, and monthly GitHub contribution statistics from a user's GitHub profile page.
 
-## Test URLs:
+## Test URLs
 
 * **TODAY**: [https://api-contrib-tornado.herokuapp.com/api/stats/today/droxey/](https://api-contrib-tornado.herokuapp.com/api/stats/today/droxey/)
 * **DAILY**: [https://api-contrib-tornado.herokuapp.com/api/stats/daily/droxey/](https://api-contrib-tornado.herokuapp.com/api/stats/daily/droxey/)
@@ -16,6 +16,14 @@ Using Tornado + BeautifulSoup to asynchronously scrape daily, weekly, and monthl
 1. `pipenv install`
 1. `pipenv shell`
 1. `python app.py`
+
+## Deployment
+
+1. `heroku login`
+1. `heroku create my-app-name --stack=cedar`
+1. `git add . && git commit -m "commit message"`
+1. `git push heroku master`
+1. `heroku ps:scale web=1`
 
 ### Special Thanks
 
