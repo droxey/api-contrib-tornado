@@ -5,9 +5,9 @@ Simple Tornado API for GitHub contributions.
 import tornado.web
 import tornado.httpserver
 import tornado.ioloop
-import tornado.options
 import tornado.autoreload
 import tornado.wsgi
+from tornado.options import define, options
 
 from contributions import get_contributions_daily, \
     get_contributions_weekly, get_contributions_monthly, \
@@ -20,6 +20,8 @@ INTERVALS = (
     ('weekly', get_contributions_weekly),
     ('monthly', get_contributions_monthly)
 )
+
+define("port", default=8888, help="run on the given port", type=int)
 
 
 class StatsHandler(tornado.web.RequestHandler):
@@ -38,6 +40,7 @@ class StatsHandler(tornado.web.RequestHandler):
 
 
 def run_server():
+    tornado.options.parse_command_line()
     app = tornado.wsgi.WSGIApplication([
         (r"/api/stats/([daily|weekly|monthly|today]+)/(\w+)+/$", StatsHandler),
     ], **{
@@ -46,7 +49,7 @@ def run_server():
     http_server = tornado.httpserver.HTTPServer(
         tornado.wsgi.WSGIContainer(app)
     )
-    http_server.listen(8888)
+    http_server.listen(options.port)
     io_loop = tornado.ioloop.IOLoop.instance()
     tornado.autoreload.start(io_loop)
     try:
