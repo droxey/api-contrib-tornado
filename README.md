@@ -21,6 +21,7 @@ Using Tornado + BeautifulSoup to scrape daily, weekly, and monthly GitHub contri
 
 1. `heroku login`
 1. `heroku create my-app-name --stack=cedar`
+1. `heroku config:add TZ="America/Los_Angeles"`
 1. `git add . && git commit -m "[deploy] Pushing to Heroku."`
 1. `git push heroku master`
 1. `heroku ps:scale web=1`
