@@ -54,6 +54,8 @@ class StatsHandler(tornado.web.RequestHandler):
             self.write(
                 f"Could not find feed named '{interval}'.\
                 Please try 'today', 'daily', 'weekly', or 'monthly.'")
+        except:
+            self.write({'error': 'An error has occurred.'})
 
 
 def run_server():
