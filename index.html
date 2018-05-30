@@ -2,7 +2,75 @@
 <html>
     <head>
         <meta charset="utf-8">
-        <title>GitHub Contributions</title>
-    </head>
-    <body> </body>
+        <title>GitHub Contributions: API Test</title>
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
+            integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous"> </head>
+    <body>
+    <div class="container">
+        <div class="jumbotron">
+            <h1 class="display-4">GitHub Contributions API</h1>
+            <p class="lead">Use Tornado + BeautifulSoup to scrape daily, weekly, and monthly GitHub contribution statistics<br> from a user's GitHub profile page. Deployable on Heroku!</p>
+            <hr class="my-4">
+            <a class="btn btn-primary btn-lg" href="https://github.com/outputs-io/api-contrib-tornado" role="button">Learn more</a>
+        </div>
+        <div class="row">
+            <div class="col-lg-4 col-md-4 col-sm-4 col-xs-hidden">&nbsp;</div>
+            <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12">
+                <form>
+                    <div class="form-group">
+                        <label for="validationCustomUsername">GitHub Username</label>
+                        <div class="input-group">
+                            <div class="input-group-prepend">
+                            <span class="input-group-text" id="inputGroupPrepend">@</span>
+                            </div>
+                            <input type="text" class="form-control-lg username" id="validationCustomUsername" placeholder="Username" aria-describedby="inputGroupPrepend" required>
+                            <div class="invalid-feedback">
+                                Please enter your GitHub username.
+                            </div>
+                        </div>
+                    </div>
+                    <input type="button" class="btn btn-primary submit" value="Get Stats JSON" style="display: none">
+                </form>
+            </div>
+            <div class="col-lg-4 col-md-4 col-sm-4 col-xs-hidden">&nbsp;</div>
+        </div>
+        <div class="row">
+            <div class="col-lg-4 col-md-4 col-sm-4 col-xs-hidden">&nbsp;</div>
+            <div class="col-lg-4 col-md-4 col-sm-4 col-xs-12">
+                <div class="view-on-submit panel" style="display: none">
+                    <br>
+                    <p>Click to view the corresponding JSON data:</p>
+                    <hr>
+                    <br>
+                    <a href="/api/stats/today/" class="btn btn-info today" target="_blank">Today</a>
+                    <a href="/api/stats/daily/" class="btn btn-warning daily" target="_blank">Daily</a>
+                    <a href="/api/stats/weekly/" class="btn btn-success weekly" target="_blank">Weekly</a>
+                    <a href="/api/stats/monthly/" class="btn btn-dark monthly" target="_blank">Monthly</a>
+                </div>
+            </div>
+            <div class="col-lg-4 col-md-4 col-sm-4 col-xs-hidden">&nbsp;</div>
+        </div>
+        </div>
+        <footer style="margin-top: 300px; font-size: 12px; color: #aaa;">
+            <p style="display: block" class="text-center">written with &hearts; by <strong><a href="https://github.com/droxey" target="_blank">droxey</a></strong></p>
+        </footer>
+        <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha256-3edrmyuQ0w65f8gfBsqowzjJe2iM6n0nKciPUp8y+7E="
+            crossorigin="anonymous"></script>
+        <script type="text/javascript">
+        $(document).ready(function() {
+            $('.username').focus();
+
+            $(document).on("submit", "form", function(e) {
+                e.preventDefault();
+                $('div.view-on-submit').css({'display': 'block'});
+                $('div.view-on-submit a').each(function(k, v) {
+                    var newUrl = $(this).attr('href') + $('.username').val() + '/';
+                    $(this).attr('href', newUrl);
+                });
+                return false;
+            });
+        });
+
+        </script>
+    </body>
 </html>
