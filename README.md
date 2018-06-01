@@ -26,6 +26,10 @@ Using Tornado + BeautifulSoup to scrape daily, weekly, and monthly GitHub contri
 1. `git push heroku master`
 1. `heroku ps:scale web=1`
 
+## Known Issues
+
+1. Data served in PST -- needs to be timezone-agnostic.
+
 ### Special Thanks
 
  `contributions.py` based upon a solution by [Chris Yunbin Chang](https://github.com/Yunbin-Chang) for his [GitHub Contributions API](https://github.com/Yunbin-Chang/Github-Contributions-API) project.

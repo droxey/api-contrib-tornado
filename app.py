@@ -43,7 +43,7 @@ class IndexHandler(tornado.web.RequestHandler):
 class StatsHandler(tornado.web.RequestHandler):
     """
     Serves GitHub Contribution data via JSON API.
-    URL: /api/stats/<daily|weekly|monthly>/<username>/
+    URL: /api/stats/<today|daily|weekly|monthly>/<username>/
     """
 
     def get(self, interval, username):
