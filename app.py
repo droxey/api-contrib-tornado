@@ -72,8 +72,8 @@ class ScrapeHandler(tornado.web.RequestHandler):
     def _get_db_connection(self):
         parsed = urlsplit(MONGODB_URI)
         db_name = parsed.path[1:]
-        db = MongoClient(url)[db_name]
-        if '@' in url:
+        db = MongoClient(MONGODB_URI)[db_name]
+        if '@' in MONGODB_URI:
             user, password = parsed.netloc.split('@')[0].split(':')
             db.authenticate(user, password)
         return db
