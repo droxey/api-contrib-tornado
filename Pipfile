@@ -9,6 +9,7 @@ tornado = "*"
 ipython = "*"
 python-dotenv = "*"
 pymongo = "*"
+pytz = "*"
 
 [dev-packages]
 rope = "*"

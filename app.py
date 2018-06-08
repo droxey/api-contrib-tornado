@@ -2,7 +2,9 @@
 server.py
 Simple Tornado API for GitHub contributions.
 """
+import datetime
 import os
+import json
 
 import tornado.autoreload
 import tornado.httpserver
@@ -11,9 +13,11 @@ import tornado.web
 import tornado.wsgi
 from tornado.options import define, options
 
+from bson import json_util
 from contributions import (get_contributions_daily, get_contributions_monthly,
                            get_contributions_today, get_contributions_weekly)
 from dotenv import load_dotenv
+from pymongo import MongoClient
 
 
 define("port", default=8889, help="run on the given port", type=int)
@@ -58,11 +62,55 @@ class StatsHandler(tornado.web.RequestHandler):
             self.write({'error': 'An error has occurred.'})
 
 
+class ScrapeHandler(tornado.web.RequestHandler):
+    """
+    Scrapes and saves the results to a MongoDB collection.
+    URL: /api/scrape/<username>/
+    """
+    client = MongoClient(MONGODB_URI)
+    db = client.gh_contribs
+
+    def _fetch_contribs_for_user(self, username):
+        db_contribs = self.db.users.find_one({"username": username})
+        return_json = json.dumps(
+            db_contribs, indent=4, default=json_util.default)
+        return return_json
+
+    def get(self, username):
+        """ Fetch user contribs from MongoDB. """
+        return_json = self._fetch_contribs_for_user(username)
+        self.write(return_json)
+        self.set_header('Content-Type', 'application/json')
+
+    def post(self, username):
+        """ Initialize a new user. """
+        daily_contribs = get_contributions_daily(username)
+        weekly_contribs = get_contributions_weekly(username)
+        monthly_contribs = get_contributions_monthly(username)
+        now = datetime.datetime.utcnow()
+        self.db.users.update_one({'username': username}, {
+            '$setOnInsert': {
+                'insertion_date': now
+            },
+            '$set': {
+                'username': username,
+                'daily': daily_contribs['contributions'],
+                'weekly': weekly_contribs['contributions'],
+                'monthly': monthly_contribs['contributions'],
+                'last_updated': now
+            }
+        }, upsert=True)
+        return_json = self._fetch_contribs_for_user(username)
+        self.write(return_json)
+        self.set_header('Content-Type', 'application/json')
+
+
 def run_server():
     """ Start Tornado. """
     tornado.options.parse_command_line()
     app = tornado.wsgi.WSGIApplication([
         (r"/$", IndexHandler),
+        (r"/api/scrape/(\w+)+/$", ScrapeHandler),
         (r"/api/stats/([daily|weekly|monthly|today]+)/(\w+)+/$", StatsHandler),
     ], **{
         'debug': True,

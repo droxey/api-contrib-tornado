@@ -4,6 +4,7 @@ Scrapes and returns GitHub Contribution data in Python dict() format.
 """
 import collections
 import datetime
+import pytz
 from urllib.request import Request, urlopen
 
 from bs4 import BeautifulSoup
@@ -27,7 +28,7 @@ def get_contributions_daily(uname, today_only=False):
     rects = _get_contributions_element(uname, today_only)
     json = {
         'contributions': {},
-        'last_updated': datetime.datetime.now().strftime(NOW_FORMAT),
+        'last_updated': datetime.datetime.utcnow().strftime(NOW_FORMAT),
         'username': uname
     }
     for rect in rects:
@@ -112,7 +113,7 @@ def _get_contributions_element(uname, today_only=False):
     html = urlopen(req).read()
     soup = BeautifulSoup(html, 'html.parser')
     if today_only:
-        dt_today = datetime.datetime.now().strftime(DAY_FORMAT)
+        dt_today = datetime.datetime.utcnow().strftime(DAY_FORMAT)
         rects = soup.find_all("rect", {"data-date": dt_today})
     else:
         rects = soup.find_all("rect")
@@ -135,7 +136,7 @@ def _get_weekdays():
         for i in week_range]
     return {
         'contributions': dict(zip(weekdays, initial)),
-        'last_updated': datetime.datetime.now().strftime(NOW_FORMAT)
+        'last_updated': datetime.datetime.utcnow().strftime(NOW_FORMAT)
     }
 
 
@@ -147,5 +148,5 @@ def _get_months():
               for i in month_range]
     return {
         'contributions': dict(zip(months, initial)),
-        'last_updated': datetime.datetime.now().strftime(NOW_FORMAT)
+        'last_updated': datetime.datetime.utcnow().strftime(NOW_FORMAT)
     }
