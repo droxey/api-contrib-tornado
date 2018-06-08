@@ -2,6 +2,8 @@
 
 Using Tornado + BeautifulSoup to scrape daily, weekly, and monthly GitHub contribution statistics from a user's GitHub profile page.
 
+Deployable on Heroku and Dokku!
+
 ## Test URLs
 
 * **TODAY**: [https://api-contrib-tornado.herokuapp.com/api/stats/today/droxey/](https://api-contrib-tornado.herokuapp.com/api/stats/today/droxey/)
@@ -17,7 +19,7 @@ Using Tornado + BeautifulSoup to scrape daily, weekly, and monthly GitHub contri
 1. `pipenv shell`
 1. `python app.py`
 
-## Deployment
+## Deployment via Heroku
 
 1. `heroku login`
 1. `heroku create my-app-name --stack=cedar`
@@ -25,6 +27,12 @@ Using Tornado + BeautifulSoup to scrape daily, weekly, and monthly GitHub contri
 1. `git add . && git commit -m "[deploy] Pushing to Heroku."`
 1. `git push heroku master`
 1. `heroku ps:scale web=1`
+
+## Deployment via Dokku
+
+1. On your remote Dokku host, run `dokku apps:create contrib-api`.
+1. In your local repo, run `git remote add dokku ssh://dokku@YOUR_DOKKU_URL/contrib-api` to add the new remote.
+1. Deploy by running `git push dokku master`.
 
 ## Known Issues
 
