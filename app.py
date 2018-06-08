@@ -70,9 +70,7 @@ class ScrapeHandler(tornado.web.RequestHandler):
     """
 
     def _get_db_connection(self):
-        url = os.getenv(
-            'MONGOLAB_URI', 'mongodb://localhost:27017/gh_contribs')
-        parsed = urlsplit(url)
+        parsed = urlsplit(MONGODB_URI)
         db_name = parsed.path[1:]
         db = MongoClient(url)[db_name]
         if '@' in url:
