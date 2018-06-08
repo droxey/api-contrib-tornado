@@ -3,8 +3,9 @@ server.py
 Simple Tornado API for GitHub contributions.
 """
 import datetime
-import os
 import json
+import os
+from urllib.parse import urlsplit
 
 import tornado.autoreload
 import tornado.httpserver
@@ -24,7 +25,7 @@ define("port", default=8889, help="run on the given port", type=int)
 load_dotenv()
 
 
-MONGODB_URI = os.getenv('MONGODB_URI')
+MONGODB_URI = os.getenv('MONGODB_URI', 'mongodb://localhost:27017/gh_contribs')
 
 INTERVALS = (
     ('today', get_contributions_today),
@@ -67,11 +68,21 @@ class ScrapeHandler(tornado.web.RequestHandler):
     Scrapes and saves the results to a MongoDB collection.
     URL: /api/scrape/<username>/
     """
-    client = MongoClient(MONGODB_URI)
-    db = client.gh_contribs
+
+    def _get_db_connection(self):
+        url = os.getenv(
+            'MONGOLAB_URI', 'mongodb://localhost:27017/gh_contribs')
+        parsed = urlsplit(url)
+        db_name = parsed.path[1:]
+        db = MongoClient(url)[db_name]
+        if '@' in url:
+            user, password = parsed.netloc.split('@')[0].split(':')
+            db.authenticate(user, password)
+        return db
 
     def _fetch_contribs_for_user(self, username):
-        db_contribs = self.db.users.find_one({"username": username})
+        db = self._get_db_connection()
+        db_contribs = db.users.find_one({"username": username})
         return_json = json.dumps(
             db_contribs, indent=4, default=json_util.default)
         return return_json
@@ -88,7 +99,8 @@ class ScrapeHandler(tornado.web.RequestHandler):
         weekly_contribs = get_contributions_weekly(username)
         monthly_contribs = get_contributions_monthly(username)
         now = datetime.datetime.utcnow()
-        self.db.users.update_one({'username': username}, {
+        db = self._get_db_connection()
+        db.users.update_one({'username': username}, {
             '$setOnInsert': {
                 'insertion_date': now
             },
