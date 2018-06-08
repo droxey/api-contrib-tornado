@@ -24,7 +24,7 @@ Deployable on Heroku and Dokku!
 1. `heroku login`
 1. `heroku create my-app-name --stack=cedar`
 1. `heroku addons:create mongolab`
-1. `heroku config:add TZ="America/Los_Angeles"`
+1. `heroku config:add TZ="UTC"`
 1. `git add . && git commit -m "[deploy] Pushing to Heroku."`
 1. `git push heroku master`
 1. `heroku ps:scale web=1`
@@ -34,10 +34,6 @@ Deployable on Heroku and Dokku!
 1. On your remote Dokku host, run `dokku apps:create contrib-api`.
 1. In your local repo, run `git remote add dokku ssh://dokku@YOUR_DOKKU_URL/contrib-api` to add the new remote.
 1. Deploy by running `git push dokku master`.
-
-## Known Issues
-
-1. Data served in PST -- needs to be timezone-agnostic.
 
 ### Special Thanks
 
