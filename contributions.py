@@ -4,13 +4,14 @@ Scrapes and returns GitHub Contribution data in Python dict() format.
 """
 import collections
 import datetime
-from urllib.request import urlopen
+from urllib.request import Request, urlopen
 
 from bs4 import BeautifulSoup
 
 MONTH_FORMAT = '%B'
 WEEKDAY_FORMAT = '%A'
-NOW_FORMAT = '%Y-%m-%d %H:%M:%S'
+DAY_FORMAT = '%Y-%m-%d'
+NOW_FORMAT = f'{DAY_FORMAT} %H:%M:%S'
 
 
 def get_contributions_daily(uname, today_only=False):
@@ -23,7 +24,7 @@ def get_contributions_daily(uname, today_only=False):
     "username": "droxey"}
     """
     contribs = {}
-    rects = _get_contributions_element(uname)
+    rects = _get_contributions_element(uname, today_only)
     json = {
         'contributions': {},
         'last_updated': datetime.datetime.now().strftime(NOW_FORMAT),
@@ -32,11 +33,8 @@ def get_contributions_daily(uname, today_only=False):
     for rect in rects:
         data_date = rect.get('data-date')
         count = int(rect.get('data-count', 0))
-        if count > 0:
+        if count > 0 or today_only:
             contribs[data_date] = count
-    if today_only:
-        today = datetime.date.today().strftime("%Y-%m-%d")
-        contribs = {today: contribs.get(today, 0)}
     json['contributions'] = collections.OrderedDict(
         sorted(contribs.items(), reverse=True))
     return json
@@ -108,12 +106,16 @@ def get_contributions_monthly(uname):
     return json
 
 
-def _get_contributions_element(uname):
+def _get_contributions_element(uname, today_only=False):
     """ Scrape profile page. """
-    url = 'https://github.com/' + uname
-    html = urlopen(url)
+    req = Request(f'https://github.com/{uname}')
+    html = urlopen(req).read()
     soup = BeautifulSoup(html, 'html.parser')
-    rects = soup.find_all("rect")
+    if today_only:
+        dt_today = datetime.datetime.now().strftime(DAY_FORMAT)
+        rects = soup.find_all("rect", {"data-date": dt_today})
+    else:
+        rects = soup.find_all("rect")
     return rects
 
 
