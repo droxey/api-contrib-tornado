@@ -15,6 +15,8 @@ DAY_FORMAT = '%Y-%m-%d'
 NOW_FORMAT = f'{DAY_FORMAT} %H:%M:%S'
 
 
+# TODO: show class that this works
+
 def get_contributions_daily(uname, today_only=False):
     """
     Output:

@@ -34,8 +34,18 @@ INTERVALS = (
     ('monthly', get_contributions_monthly)
 )
 
+class BaseHandler(tornado.web.RequestHandler):
+    """
+    Inherit from this class to enable CORS.
+    """
 
-class IndexHandler(tornado.web.RequestHandler):
+    def set_default_headers(self):
+        self.set_header("Access-Control-Allow-Origin", "*")
+        self.set_header("Access-Control-Allow-Headers", "x-requested-with")
+        self.set_header('Access-Control-Allow-Methods', 'POST, GET, OPTIONS')
+
+
+class IndexHandler(BaseHandler):
     """
     Serves the homepage for the project.
     URL: /
@@ -45,7 +55,7 @@ class IndexHandler(tornado.web.RequestHandler):
         self.render("index.html", **{})
 
 
-class StatsHandler(tornado.web.RequestHandler):
+class StatsHandler(BaseHandler):
     """
     Serves GitHub Contribution data via JSON API.
     URL: /api/stats/<today|daily|weekly|monthly>/<username>/
@@ -63,7 +73,7 @@ class StatsHandler(tornado.web.RequestHandler):
             self.write({'error': 'An error has occurred.'})
 
 
-class ScrapeHandler(tornado.web.RequestHandler):
+class ScrapeHandler(BaseHandler):
     """
     Scrapes and saves the results to a MongoDB collection.
     URL: /api/scrape/<username>/
